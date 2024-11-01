@@ -1,0 +1,63 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-md-10">
+    <div class="card">
+    <div class="card-header">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+            <h4>Employee Advance Payments</h4>
+            </div>
+            <div class="col-sm-6 float-sm-right">
+                <a href="{{ route('employee-advance-payments.create') }}" class="btn btn-info float-sm-right"><i class="fas fa-plus-circle"></i> Create New</a>
+            </div>
+            </div>
+            </div>
+        <div class="table-responsive">
+
+<table class="table">
+<thead>
+    <tr>
+        <th>Sl No.</th>
+        <th>Employee Name</th>
+        <th>Purpose</th>
+        <th>Amount</th>
+        <th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach ($advancePayments as $advancePayment)
+        <tr>
+            <td>{{ $advancePayment->id }}</td>
+            <td>{{ $advancePayment->employee->name }}</td>
+            <td>{{ $advancePayment->purpose }}</td>
+            <td>{{ $advancePayment->amount }}</td>
+            <td>
+                <a class="btn btn-primary btn-sm" href="{{ route('employee-advance-payments.show', $advancePayment->id) }}" class="btn btn-warning"data-toggle="tooltip" data-placement="left" title="Show"><i class="fas fa-eye"></i></a>
+                <a class="btn btn-warning btn-sm" href="{{ route('employee-advance-payments.edit', $advancePayment->id) }}" class="btn btn-warning"data-toggle="tooltip" data-placement="left" title="Edit"><i class="fas fa-edit"></i></a>
+            
+                <form action="{{ route('employee-advance-payments.destroy', $advancePayment->id) }}" method="POST" style="display:inline-block;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="left" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
+            </td>
+            
+        </tr>
+    @endforeach
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+@endsection

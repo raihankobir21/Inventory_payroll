@@ -1,0 +1,248 @@
+<?php
+
+namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+
+use App\Models\Employee;
+use App\Models\EmployeeDetails;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
+
+class EmployeeController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+
+    public function index(Request $request)
+    {
+        $data = Employee::select('id', 'staff_id', 'name', 'mobile_no','status')->orderBy('id','DESC')->paginate(10);
+
+        return view('backend.employees.index',compact( 'data' ))
+            ->with('i', ($request->input('page', 1) - 1) * 10);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+        return view('backend.employees.create');
+
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validatedData = $request->validate([
+
+            'staff_id' => 'required|string|max:15|unique:employees,staff_id,',
+            'name' => 'required|max:60',
+            'mobile_no' => 'required|regex:([0-9])|size:11',
+            'designation' => 'required|max:60',
+            'email' => 'required|max:60',
+            'nid_no' => 'required|max:30',
+            'joining_date' => 'required|date_format:Y-m-d',
+            'present_address' => 'required',
+            'permanent_address' => 'required',
+            'emergency_contact' => 'required',
+            'blood_group' => 'required',
+            'joining_salary' => 'required',
+            'photo' => 'required|mimes:jpeg,png,jpg,webp',
+
+        ]);
+        
+        $input = $request->all();
+
+        // dd($request->all());
+        $imgCheck = $input['photo'];
+
+        if(!empty($imgCheck)){
+
+        $imagePath = $input['photo'];
+        $imageName = 'employee_'.date('Ymdhis_').$imagePath->getClientOriginalName();
+        $path = $imagePath->storeAs('employee', $imageName, 'public');
+    
+        }
+
+        $employeeItem = Employee::create([
+            'staff_id' => $request->staff_id,
+            'name' => $request->name,
+            'mobile_no' => $request->mobile_no,
+            'created_by' => auth()->id(),
+            'modified_by' => auth()->id(),
+        ]);
+    
+
+        if( $employeeItem ) {  
+            
+            if($imgCheck){
+
+                $employeeDetails->photo = $imageName;
+
+            }
+
+            // $employeeDetails = new EmployeeDetails();
+
+            // $employeeDetails->staff_id = !empty($request->staff_id) ? $request->staff_id : '';
+            // $employeeDetails->designation = !empty($request->designation) ? $request->designation : '';
+            // $employeeDetails->email = !empty($request->email) ? $request->email : '';
+            // $employeeDetails->nid_no = !empty($request->nid_no) ? $request->nid_no : '';
+            // $employeeDetails->joining_date = date("Y-m-d h:i:s", strtotime($request->joining_date));
+            // $employeeDetails->present_address = !empty($request->present_address) ? $request->present_address : '';
+            // $employeeDetails->permanent_address = !empty($request->permanent_address) ? $request->permanent_address : '';
+            // $employeeDetails->emergency_contact = !empty($request->emergency_contact) ? $request->emergency_contact : '';
+            // $employeeDetails->blood_group = !empty($request->blood_group) ? $request->blood_group : '';
+            // $employeeDetails->joining_salary = !empty($request->joining_salary) ? $request->joining_salary : '';
+            // $employeeDetails->created_by = auth()->id();
+            // $employeeDetails->modified_by = auth()->id();
+
+            $input['staff_id'] = $input['staff_id'];
+            $input['designation'] = $input['designation'];
+            $input['staff_id'] = $input['staff_id'];
+            $input['staff_id'] = $input['staff_id'];
+            $input['staff_id'] = $input['staff_id'];
+            $input['staff_id'] = $input['staff_id'];
+            $input['staff_id'] = $input['staff_id'];
+    
+            $investigation = EmployeeDetails::create($input);
+
+            $employeeItem->employeeDetails()->save($employeeDetails);
+    
+            // dd("ok");
+            $responseStatus = 'success';
+            $responseMessage = 'Employee inserted successfully.';
+
+        }else{
+            $responseStatus = 'error';
+            $responseMessage = 'Something went wrong, please try again.';
+       
+        }
+
+        // Redirect back or wherever needed after successful save
+        return redirect()->route('employees.index')
+                        ->with($responseStatus, $responseMessage);    
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Employee $employee)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Employee $employee)
+    {
+        //
+        dd($employee);
+    }
+
+    // public function edit($id)
+    // {
+    //     //
+    //     dd($id);
+    // }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(UpdateEmployeeRequest $request, Employee $employee)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Employee $employee)
+    {
+        //
+    }
+    ============================================================
+    public function update(Request $request, $id)
+{
+    // Find the existing employee record
+    $employee = Employee::findOrFail($id);
+
+    // Validate the request data
+    $validatedData = $request->validate([
+        'staff_id' => 'required|string|max:15|unique:employees,staff_id,' . $id,
+        'name' => 'required|max:60',
+        'mobile_no' => 'required|regex:([0-9])|size:11',
+        'designation' => 'required|max:60',
+        'email' => 'required|max:60',
+        'nid' => 'nullable|mimes:jpeg,png,jpg,webp', // NID is optional on update
+        'joining_date' => 'required|date_format:Y-m-d',
+        'present_address' => 'required',
+        'permanent_address' => 'required',
+        'emergency_contact' => 'required',
+        'blood_group' => 'required',
+        'joining_salary' => 'required',
+        'photo' => 'nullable|mimes:jpeg,png,jpg,webp', // Photo is optional on update
+    ]);
+
+    // Update employee record
+    $employee->staff_id = $validatedData['staff_id'];
+    $employee->name = $validatedData['name'];
+    $employee->mobile_no = $validatedData['mobile_no'];
+    $employee->designation = $validatedData['designation'];
+    $employee->email = $validatedData['email'];
+    $employee->joining_date = $validatedData['joining_date'];
+    $employee->present_address = $validatedData['present_address'];
+    $employee->permanent_address = $validatedData['permanent_address'];
+    $employee->emergency_contact = $validatedData['emergency_contact'];
+    $employee->blood_group = $validatedData['blood_group'];
+    $employee->joining_salary = $validatedData['joining_salary'];
+    $employee->save();
+
+    // Update employee details
+    $employeeDetails = $employee->employeeDetails;
+    if (!$employeeDetails) {
+        $employeeDetails = new EmployeeDetails();
+    }
+
+    $employeeDetails->joining_date = $validatedData['joining_date'];
+    $employeeDetails->staff_id = $validatedData['staff_id'];
+    $employeeDetails->designation = $validatedData['designation'];
+    $employeeDetails->email = $validatedData['email'];
+    $employeeDetails->present_address = $validatedData['present_address'];
+    $employeeDetails->permanent_address = $validatedData['permanent_address'];
+    $employeeDetails->emergency_contact = $validatedData['emergency_contact'];
+    $employeeDetails->blood_group = $validatedData['blood_group'];
+    $employeeDetails->joining_salary = $validatedData['joining_salary'];
+    $employeeDetails->created_by = !empty(Auth::user()->id) ? Auth::user()->id : 0;
+
+    // Handle file uploads
+    if ($request->hasFile('photo')) {
+        $imagePath = $request->file('photo');
+        $imageName = 'employee_' . date('Ymdhis_') . $imagePath->getClientOriginalName();
+        $imagePath->storeAs('employee', $imageName, 'public');
+        $employeeDetails->photo = $imageName;
+    }
+
+    if ($request->hasFile('nid')) {
+        $imagePath = $request->file('nid');
+        $imageName = 'nationalIdCard_' . date('Ymdhis_') . $imagePath->getClientOriginalName();
+        $imagePath->storeAs('nationalIdCard', $imageName, 'public');
+        $employeeDetails->nid = $imageName;
+    }
+
+    $employee->employeeDetails()->save($employeeDetails);
+
+    // Prepare the response
+    $responseStatus = 'success';
+    $responseMessage = 'Employee updated successfully.';
+
+    // Redirect back or wherever needed after successful save
+    return redirect()->route('employees.index')
+                     ->with($responseStatus, $responseMessage);
+}
+}

@@ -1,0 +1,35 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row mb-3">
+            <h1>Employee Advance Payment Details</h1>
+        <div class="col-sm-8 text-right">
+            <a href="{{ route('employee-advance-payments.index') }}" class="btn btn-info"><i class="fas fa-angle-left"></i> Back</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            Advance Payment #{{ $advancePayment->id }}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Employee Name: {{ $advancePayment->employee->name }}</h5>
+            <p class="card-text"><strong>Staff ID:</strong> {{ $advancePayment->employee->staff_id }}</p>
+            <p class="card-text"><strong>Purpose:</strong> {{ $advancePayment->purpose }}</p>
+            <p class="card-text"><strong>Amount:</strong> {{ $advancePayment->amount }}</p>
+            <p class="card-text"><strong>Created By:</strong> {{ $advancePayment->created_by }}</p>
+            <p class="card-text"><strong>Modified By:</strong> {{ $advancePayment->modified_by }}</p>
+            <p class="card-text"><strong>Created At:</strong> {{ $advancePayment->created_at }}</p>
+            <p class="card-text"><strong>Updated At:</strong> {{ $advancePayment->updated_at }}</p>
+            <a class="btn btn-warning btn-sm" href="{{ route('employee-advance-payments.edit', $advancePayment->id) }}" data-toggle="tooltip" data-placement="left" title="Edit"><i class="fas fa-edit"></i></a>
+            <form action="{{ route('employee-advance-payments.destroy', $advancePayment->id) }}" method="POST" style="display:inline-block;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="left" title="Delete">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+@endsection
